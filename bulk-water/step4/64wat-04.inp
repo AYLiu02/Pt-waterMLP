@@ -1,0 +1,99 @@
+@SET PATH /rds/general/user/yl4619/home/projects/mlp_cc/64wat/step3/final-training/model
+
+&GLOBAL
+  PROJECT 64wat
+  PRINT_LEVEL LOW
+  RUN_TYPE MD
+&END GLOBAL
+
+&FORCE_EVAL
+  METHOD NNP
+  &NNP
+    NNP_INPUT_FILE_NAME ${PATH}/nnp-000/input.nn
+    SCALE_FILE_NAME ${PATH}/nnp-000/scaling.data
+    &MODEL
+      WEIGHTS ${PATH}/nnp-000/weights
+    &END MODEL
+    &MODEL
+      WEIGHTS ${PATH}/nnp-001/weights
+    &END MODEL
+    &MODEL
+      WEIGHTS ${PATH}/nnp-002/weights
+    &END MODEL
+    &MODEL
+      WEIGHTS ${PATH}/nnp-003/weights
+    &END MODEL
+    &MODEL
+      WEIGHTS ${PATH}/nnp-004/weights
+    &END MODEL
+    &MODEL
+      WEIGHTS ${PATH}/nnp-005/weights
+    &END MODEL
+    &MODEL
+      WEIGHTS ${PATH}/nnp-006/weights
+    &END MODEL
+    &MODEL
+      WEIGHTS ${PATH}/nnp-007/weights
+    &END MODEL
+    &PRINT
+      &ENERGIES SILENT
+        &EACH
+          MD 1
+        &END EACH
+      &END ENERGIES
+    &END PRINT
+  &END NNP
+  &SUBSYS
+    &CELL 
+      ABC  12.42 12.42 12.42
+    &END CELL
+    &COORD
+      @INCLUDE 'revPBE0-D3-w64-T300K-1bar.xyz'
+    &END COORD
+    &KIND O
+     BASIS_SET DZVP-MOLOPT-SR-GTH-q6
+     POTENTIAL GTH-PBE-q6
+    &END KIND
+    &KIND H
+     BASIS_SET DZVP-MOLOPT-SR-GTH-q1
+     POTENTIAL GTH-PBE-q1
+     MASS 2.0
+    &END KIND
+  &END SUBSYS
+&END FORCE_EVAL
+
+&MOTION
+  &MD
+    ENSEMBLE LANGEVIN
+    STEPS 100000
+    TIMESTEP 1.0
+    TEMPERATURE 330
+    TEMP_KIND
+    COMVEL_TOL 0.0
+    &LANGEVIN
+      GAMMA 0.0025
+    &END LANGEVIN
+  &END MD
+  &PRINT
+    &FORCES
+      UNIT eV*angstrom^-1
+      &EACH
+	MD 5
+      &END EACH
+    &END FORCES
+    &TRAJECTORY
+      &EACH
+        MD 5
+      &END EACH
+    &END TRAJECTORY
+    &VELOCITIES
+      &EACH
+        MD 5
+      &END EACH
+    &END VELOCITIES
+  &END PRINT
+  &GEO_OPT
+   OPTIMIZER BFGS
+   MAX_ITER 1000
+  &END GEO_OPT
+&END MOTION
